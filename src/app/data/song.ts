@@ -120,36 +120,32 @@ export class Song implements SongIface {
       throw new Error('Invalid state, no section.');
     }
 
-    const initialParticleForOldSection = this.initialParticle(state.section);
+    const lastParticleForOldSection = this.endParticle(state.section);
 
     if (!state.nextSection || state.nextSection === SongSection.UNKNOWN) {
       // Loop the same section. Simply switch the particles.
       const newParticle =
-        state.nextParticle === initialParticleForOldSection
-          ? this.endParticle(state.section)
-          : initialParticleForOldSection;
+        state.nextParticle === lastParticleForOldSection
+          ? lastParticleForOldSection
+          : this.initialParticle(state.section);
       return new SongState(state.section, state.nextParticle, newParticle);
     }
-    if (
-      state.particle === initialParticleForOldSection
-    ) {
-      // We need to move to the next particle of the same section with a
-      // transition
+    if (state.particle === lastParticleForOldSection) {
+      // We need to move to the next section
       return new SongState(
-        state.section,
+        state.nextSection,
         state.nextParticle,
-        this.initialParticle(state.nextSection),
-        state.nextSection
+        this.endParticle(state.nextSection)
       );
     }
-
-    // We need to move to the next section
+    // We need to move to the next particle of the same section with a
+    // transition
     return new SongState(
-      state.nextSection,
+      state.section,
       state.nextParticle,
-      this.endParticle(state.nextSection)
+      this.initialParticle(state.nextSection),
+      state.nextSection
     );
-
     // if (!state.particle || state.particle === SongParticle.UNKNOWN) {
     //   return new SongState(
     //     state.section,
@@ -196,18 +192,18 @@ export class Song implements SongIface {
       const initial = this.initialParticle(nextSection);
       return new SongState(nextSection, this.endParticle(nextSection), initial);
     }
-    if (state.particle === this.initialParticle(state.section)) {
+    if (state.particle === this.endParticle(state.section)) {
       return new SongState(
         state.section,
         state.particle,
-        this.transitionParticle(state.section, nextSection),
+        this.initialParticle(nextSection),
         nextSection
       );
     }
     return new SongState(
       state.section,
       state.particle,
-      this.initialParticle(nextSection),
+      this.transitionParticle(state.section, nextSection),
       nextSection
     );
   }
@@ -265,6 +261,10 @@ export class Song implements SongIface {
         return SongParticle.CHORUS_END;
       case SongSection.BRIDGE:
         return SongParticle.BRIDGE_END;
+      case SongSection.OUTRO:
+        return SongParticle.OUTRO;
+      case SongSection.INTRO:
+        return SongParticle.INTRO;
       default:
         throw new Error('Invalid section');
     }
