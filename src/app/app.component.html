@@ -1,13 +1,26 @@
 <button (click)="loadSong()">Load Song</button>
+@let songState=(songState$ | async);
 
-@for (section of availableSections; track section) {
-  <button (click)="play(section)">{{ section }}</button>
+@if (!songState?.section) {
+  <button (click)="play(SongSection.VERSE, true)">Start with Verse</button>
+  <button (click)="play(SongSection.CHORUS, true)">Start with Chorus</button>
+} @else {
+
+  @for (section of availableSections; track section) {
+    <button (click)="play(section)">{{ section }}</button>
+  }
+  <button (click)="stop()">Stop</button>
 }
-<button (click)="stop()">Stop</button>
 
 <p>
-  Section playing: {{ (section$ | async) || 'None' }}
+  Section playing: {{ songState?.section || 'None' }}
 </p>
 <p>
-  Next section: {{ (nextSection$ | async) || 'None' }}
+  Next section: {{ songState?.nextSection || 'None' }}
+</p>
+<p>
+  Particle playing: {{ songState?.particle || 'None' }}
+</p>
+<p>
+  Next Particle: {{ songState?.nextParticle || 'None' }}
 </p>

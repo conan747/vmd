@@ -1,7 +1,8 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { PlayerService } from './player.service';
-import { SongSection } from './data/song';
+import { SongParticle } from './data/song';
 import { inject } from '@angular/core';
+import { SongSection } from './data/song';
 
 @Component({
   selector: 'app-root',
@@ -11,24 +12,17 @@ import { inject } from '@angular/core';
 })
 export class AppComponent {
   readonly playerService: PlayerService = inject(PlayerService);
+  protected readonly SongParticle = SongParticle;
   protected readonly SongSection = SongSection;
-  readonly section$ = this.playerService.section$;
-  readonly nextSection$ = this.playerService.nextSection$;
+  // readonly section$ = this.playerService.section$;
+  // readonly nextSection$ = this.playerService.nextSection$;
+  readonly songState$ = this.playerService.songState$;
 
   readonly availableSections = [
     SongSection.INTRO,
     SongSection.VERSE,
-    SongSection.MID_VERSE,
-    SongSection.VERSE_2_VERSE,
-    SongSection.VERSE_2_CHORUS,
     SongSection.CHORUS,
-    SongSection.MID_CHORUS,
-    SongSection.CHORUS_2_CHORUS,
-    SongSection.CHORUS_2_VERSE,
-    SongSection.CHORUS_2_BRIDGE,
     SongSection.BRIDGE,
-    SongSection.MID_BRIDGE,
-    SongSection.BRIDGE_2_CHORUS,
     SongSection.OUTRO,
   ];
 
@@ -36,8 +30,12 @@ export class AppComponent {
     this.playerService.loadSong('/assets/sad_jazz_full.mp3');
   }
 
-  play(section: SongSection) {
-    this.playerService.enqueue(section);
+  play(section: SongSection, fromIntro = false) {
+    if (fromIntro) {
+      this.playerService.introTo(section);
+    } else {
+      this.playerService.enqueue(section);
+    }
   }
 
   stop() {
