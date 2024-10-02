@@ -58,22 +58,25 @@ interface SongIface {
   tempo?: number;
 }
 
-export class SongState {
+interface SongParticleIface {
+  section?: SongSection;
+  particle?: SongParticle;
+  nextParticle?: SongParticle;
+  nextSection?: SongSection;
+}
+
+
+export class SongState implements SongParticleIface {
   readonly section?: SongSection;
   readonly particle?: SongParticle;
   readonly nextParticle?: SongParticle;
   readonly nextSection?: SongSection;
 
-  constructor(
-    section?: SongSection,
-    particle?: SongParticle,
-    nextParticle?: SongParticle,
-    nextSection?: SongSection
-  ) {
-    this.section = section;
-    this.particle = particle;
-    this.nextSection = nextSection;
-    this.nextParticle = nextParticle;
+  constructor(builder: SongParticleIface) {
+    this.section = builder.section;
+    this.particle = builder.particle;
+    this.nextSection = builder.nextSection;
+    this.nextParticle = builder.nextParticle;
   }
 }
 
@@ -120,92 +123,75 @@ export class Song implements SongIface {
       throw new Error('Invalid state, no section.');
     }
 
-    const lastParticleForOldSection = this.endParticle(state.section);
-
     if (!state.nextSection || state.nextSection === SongSection.UNKNOWN) {
       // Loop the same section. Simply switch the particles.
-      const newParticle =
-        state.nextParticle === lastParticleForOldSection
-          ? lastParticleForOldSection
-          : this.initialParticle(state.section);
-      return new SongState(state.section, state.nextParticle, newParticle);
+      // const newParticle =
+      //   state.nextParticle === lastParticleForOldSection
+      //     ? lastParticleForOldSection
+      //     : this.initialParticle(state.section);
+      return new SongState({
+        section: state.section,
+        particle: state.nextParticle,
+        nextParticle: state.particle,
+      });
     }
-    if (state.particle === lastParticleForOldSection) {
-      // We need to move to the next section
-      return new SongState(
-        state.nextSection,
-        state.nextParticle,
-        this.endParticle(state.nextSection)
-      );
+    if (state.nextSection === SongSection.OUTRO) {
+      return new SongState({}); // We're done.
     }
-    // We need to move to the next particle of the same section with a
-    // transition
-    return new SongState(
-      state.section,
-      state.nextParticle,
-      this.initialParticle(state.nextSection),
-      state.nextSection
-    );
-    // if (!state.particle || state.particle === SongParticle.UNKNOWN) {
-    //   return new SongState(
-    //     state.section,
-    //     initialParticleForSection,
-    //     initialParticleForSection
-    //   );
-    // }
-    // if (state.particle === initialParticleForSection) {
-    //   // We need to move to the next particle of the same section
-    //   if (!state.nextSection) {
-    //     // We loop the same section.
-    //     return new SongState(
-    //       state.section,
-    //       initialParticleForSection,
-    //       this.endParticle(state.section)
-    //     );
-    //   }
-    //   // We prepare the transition to the next section.
-    //   return new SongState(
-    //     state.section,
-    //     this.transitionParticle(state.section, state.nextSection),
-    //     this.transitionParticle(state.section, state.nextSection),
-    //     state.nextSection
-    //   );
-    // }
-    // //we need to move to the next section
-    // if (!state.nextSection) {
-    //   // We loop the same section.
-    //   return new SongState(state.section, this.endParticle(state.section));
-    // }
-    // return new SongState(
-    //   state.nextSection,
-    //   this.initialParticle(state.nextSection)
-    // );
+    if (state.particle === SongParticle.UNKNOWN) {
+      // It's not currently playing.
+      return new SongState({
+        section: state.section,
+        particle: state.nextParticle,
+        nextParticle: this.initialParticle(state.nextSection),
+        nextSection: state.nextSection,
+      });
+    }
+    if (state.particle === this.initialParticle(state.section) 
+      && state.particle !== this.endParticle(state.section)) {
+      // We need to move to the next particle of the same section with a
+      // transition
+      return new SongState({
+        section: state.section,
+        particle: state.nextParticle,
+        nextParticle: this.initialParticle(state.nextSection),
+        nextSection: state.nextSection,
+      });
+    }
+    // We need to move to the next section
+    return new SongState({
+      section: state.nextSection,
+      particle: state.nextParticle,
+      nextParticle: this.endParticle(state.nextSection)
+    });
   }
 
   updateNextSection(state: SongState, nextSection: SongSection): SongState {
+    const songStateConfig = {
+      section: state.section,
+      particle: state.particle,
+      nextSection,
+    };
     if (
       !state.section ||
       state.section === SongSection.UNKNOWN ||
       !state.particle ||
       state.particle === SongParticle.UNKNOWN
     ) {
-      const initial = this.initialParticle(nextSection);
-      return new SongState(nextSection, this.endParticle(nextSection), initial);
+      // const initial = this.initialParticle(nextSection);
+      // return new SongState(nextSection, this.endParticle(nextSection), initial);
+      throw new Error('Invalid initial state to update next section');
     }
     if (state.particle === this.endParticle(state.section)) {
-      return new SongState(
-        state.section,
-        state.particle,
-        this.initialParticle(nextSection),
-        nextSection
-      );
+      return new SongState({
+        ...songStateConfig,
+        nextParticle: this.initialParticle(nextSection)
+      });
     }
-    return new SongState(
-      state.section,
-      state.particle,
-      this.transitionParticle(state.section, nextSection),
-      nextSection
-    );
+    return new SongState({
+      ...songStateConfig,
+      nextParticle: this.transitionParticle(state.section, nextSection),
+    });
   }
 
   private transitionParticle(from: SongSection, to: SongSection): SongParticle {
@@ -233,7 +219,10 @@ export class Song implements SongIface {
     if (from === SongSection.BRIDGE && to === SongSection.CHORUS) {
       return SongParticle.BRIDGE_2_CHORUS;
     }
-    throw new Error('Invalid transition');
+    if (from === SongSection.CHORUS && to === SongSection.OUTRO) {
+      return SongParticle.OUTRO;
+    }
+    throw new Error(`Invalid transition from ${from} to ${to}`);
   }
 
   private initialParticle(section: SongSection): SongParticle {

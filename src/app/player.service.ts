@@ -12,7 +12,7 @@ export class PlayerService {
   private readonly http = inject(HttpClient);
   private audioContext: AudioContext = new AudioContext();
   private song?: Song;
-  private songState: SongState = new SongState();
+  private songState: SongState = new SongState({});
 
   private playing = false;
 
@@ -34,7 +34,7 @@ export class PlayerService {
     );
     const audioBuffer = await this.audioContext.decodeAudioData(response);
     this.song = new Song({ name: url, buffer: audioBuffer, tempo: 100 });
-    this.songState = new SongState();
+    this.songState = new SongState({});
   }
 
   introTo(section: SongSection) {
@@ -42,9 +42,15 @@ export class PlayerService {
       throw new Error('No song loaded');
     }
 
-    this.songState = new SongState(SongSection.INTRO, SongParticle.INTRO, SongParticle.INTRO, section);
+    this.songState = new SongState(
+      {
+        section: SongSection.INTRO,
+        particle: SongParticle.UNKNOWN,
+        nextParticle: SongParticle.INTRO,
+        nextSection: section,
+      });
     this.updateBuffer();
-    return this.step();
+    this.step();
   }
 
   enqueue(section: SongSection) {
