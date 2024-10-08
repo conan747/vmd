@@ -35,6 +35,7 @@ export class PlayerService {
     const audioBuffer = await this.audioContext.decodeAudioData(response);
     this.song = new Song({ name: url, buffer: audioBuffer, tempo: 100 });
     this.songState = new SongState({});
+    this.songState$.next(this.songState);
   }
 
   introTo(section: SongSection) {
@@ -102,20 +103,6 @@ export class PlayerService {
     this.songState$.next(this.songState);
     this.updateBuffer();
   }
-
-  /*   private playNextOnQueue() {
-    this.nextSection$.next(null);
-    if (!this.next) {
-      console.log('No section queued.');
-      this.playing = false;
-      this.section$.next(null);
-      return;
-    }
-    this.next.buffer.start();
-    this.section$.next(this.next.section);
-    this.next = undefined;
-    this.playing = true;
-  } */
 
   stop() {
     this.audioContext.close();

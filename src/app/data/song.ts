@@ -125,10 +125,6 @@ export class Song implements SongIface {
 
     if (!state.nextSection || state.nextSection === SongSection.UNKNOWN) {
       // Loop the same section. Simply switch the particles.
-      // const newParticle =
-      //   state.nextParticle === lastParticleForOldSection
-      //     ? lastParticleForOldSection
-      //     : this.initialParticle(state.section);
       return new SongState({
         section: state.section,
         particle: state.nextParticle,
@@ -147,7 +143,7 @@ export class Song implements SongIface {
         nextSection: state.nextSection,
       });
     }
-    if (state.particle === this.initialParticle(state.section) 
+    if (state.particle === this.initialParticle(state.section)
       && state.particle !== this.endParticle(state.section)) {
       // We need to move to the next particle of the same section with a
       // transition
@@ -178,8 +174,6 @@ export class Song implements SongIface {
       !state.particle ||
       state.particle === SongParticle.UNKNOWN
     ) {
-      // const initial = this.initialParticle(nextSection);
-      // return new SongState(nextSection, this.endParticle(nextSection), initial);
       throw new Error('Invalid initial state to update next section');
     }
     if (state.particle === this.endParticle(state.section)) {

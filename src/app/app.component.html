@@ -1,16 +1,20 @@
-<button (click)="loadSong()">Load Song</button>
 @let songState=(songState$ | async);
 
-@if (!songState?.section) {
-  <button (click)="play(SongSection.VERSE, true)">Start with Verse</button>
-  <button (click)="play(SongSection.CHORUS, true)">Start with Chorus</button>
+@if (songState === null) {
+  <button (click)="loadSong()">Load Song</button>
 } @else {
-
-  @for (section of availableSections; track section) {
-    <button (click)="play(section)">{{ section }}</button>
+  @if (!songState?.section) {
+    <button mat-fab aria-label="Example icon button with a delete icon" (click)="play(SongSection.VERSE, true)">Start with Verse</button>
+    <button mat-fab (click)="play(SongSection.CHORUS, true)">Start with Chorus</button>
+  } @else {
+  
+    @for (section of availableSections; track section) {
+      <button mat-fab class="queue-section-button {{section}}" (click)="play(section)">{{ section }}</button>
+    }
+    <button mat-fab (click)="stop()">Stop</button>
   }
-  <button (click)="stop()">Stop</button>
 }
+
 
 <p>
   Section playing: {{ songState?.section || 'None' }}
