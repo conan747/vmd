@@ -1,19 +1,21 @@
 
 .queue-section-button {
     margin: 10px;
-
-    .verse {
-        color: blue;
+    color: black;
+}
+    button {
+    &.verse {
+        background-color: blue;
     }
 
-    .chorus {
-        color: yellow;
+    &.chorus {
+        background-color: yellow;
     }
 
-    .bridge {
-        color: green;
+    &.bridge {
+        background-color: green;
     }
-    .outro {
-        color: red;
+    &.outro {
+        background-color: red;
     }
 }

@@ -4,8 +4,8 @@
   <button (click)="loadSong()">Load Song</button>
 } @else {
   @if (!songState?.section) {
-    <button mat-fab aria-label="Example icon button with a delete icon" (click)="play(SongSection.VERSE, true)">Start with Verse</button>
-    <button mat-fab (click)="play(SongSection.CHORUS, true)">Start with Chorus</button>
+    <button mat-fab aria-label="Example icon button with a delete icon" (click)="play(SongSection.VERSE, true)" class="verse">Start with Verse</button>
+    <button mat-fab (click)="play(SongSection.CHORUS, true)" class="chorus">Start with Chorus</button>
   } @else {
   
     @for (section of availableSections; track section) {
