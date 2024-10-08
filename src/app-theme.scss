@@ -1,0 +1,16 @@
+@use '@angular/material' as mat;
+
+// Define a custom palette
+$custom-primary: mat-palette($mat-blue, 500, 300, 700);
+
+// Create a theme using the custom palette
+$custom-theme: mat-light-theme(
+  (
+    color: (
+      primary: $custom-primary,
+    )
+  )
+);
+
+// Include Angular Material theme styles
+@include angular-material-theme($custom-theme);
