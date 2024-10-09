@@ -28,7 +28,7 @@ export class AppComponent implements OnInit {
   }
 
   loadSong() {
-    this.playerService.loadSong('vmd/assets/sad_jazz_full.mp3');
+    this.playerService.loadSong('assets/sad_jazz_full.mp3');
   }
 
   play(section: SongSection, fromIntro = false) {
