@@ -6,7 +6,8 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "deploy": "rm -r out/* && ng build --output-path out --base-href vmd && rsync -Prua out/browser/* docs"
   },
   "private": true,
   "dependencies": {
