@@ -52,6 +52,11 @@ const SongParticles = new Map<
   [SongParticle.BRIDGE_END, { startBar: 76, duration: 1 }],
 ]);
 
+// Apparently javascript introduces rounding errors even in multiplication. 
+// Therefore, we need to multiply by a large number, math.round it
+// and then divide by the same number to fix the rounding error.
+const ROUNDING_ERROR_FIXER = 1000;
+
 interface SongIface {
   name: string;
   buffer: AudioBuffer;
@@ -100,8 +105,8 @@ export class Song implements SongIface {
   getParticle(ctx: AudioContext, particle: SongParticle): AudioBuffer {
     const duration = this.getParticleDuration(particle);
     const startTime = this.getParticleStartTime(particle);
-    const offset = startTime * this.buffer.sampleRate;
-    const sampleDuration = duration * this.buffer.sampleRate;
+    const offset = Math.round(startTime * this.buffer.sampleRate * ROUNDING_ERROR_FIXER) / ROUNDING_ERROR_FIXER;
+    const sampleDuration = Math.round(duration * this.buffer.sampleRate * ROUNDING_ERROR_FIXER) / ROUNDING_ERROR_FIXER;
 
     const subBuffer = ctx.createBuffer(
       this.buffer.numberOfChannels,
@@ -258,7 +263,7 @@ export class Song implements SongIface {
     if (!particleData) {
       throw new Error('Invalid particle');
     }
-    return particleData.startBar * this.barDuration;
+    return Math.round(particleData.startBar * this.barDuration * ROUNDING_ERROR_FIXER) / ROUNDING_ERROR_FIXER;
   }
 
   private getParticleDuration(particle: SongParticle): number {
@@ -266,6 +271,6 @@ export class Song implements SongIface {
     if (!particleData) {
       throw new Error('Invalid particle');
     }
-    return particleData.duration * this.barDuration;
+    return Math.round(particleData.duration * this.barDuration * ROUNDING_ERROR_FIXER) / ROUNDING_ERROR_FIXER;
   }
 }
