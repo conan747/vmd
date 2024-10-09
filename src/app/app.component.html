@@ -1,30 +1,36 @@
 @let songState=(songState$ | async);
 
-@if (songState === null) {
-  <button (click)="loadSong()">Load Song</button>
-} @else {
-  @if (!songState?.section) {
-    <button mat-fab aria-label="Example icon button with a delete icon" (click)="play(SongSection.VERSE, true)" class="verse">Start with Verse</button>
-    <button mat-fab (click)="play(SongSection.CHORUS, true)" class="chorus">Start with Chorus</button>
-  } @else {
-  
-    @for (section of availableSections; track section) {
-      <button mat-fab class="queue-section-button {{section}}" (click)="play(section)">{{ section }}</button>
+<div class="card">
+  <div class="button-section">
+    @if (songState === null) {
+      <button (click)="loadSong()">Load Song</button>
+    } @else {
+      @if (!songState?.section) {
+        <button mat-fab (click)="play(SongSection.VERSE, true)" class="verse">
+          Start with Verse
+        </button>
+        <button mat-fab (click)="play(SongSection.CHORUS, true)" class="chorus">
+          Start with Chorus
+        </button>
+      } @else {
+      
+        @for (section of availableSections; track section) {
+          <button mat-fab class="queue-section-button {{section}}" (click)="play(section)">{{ section }}</button>
+        }
+        <!-- <button mat-fab (click)="stop()">Stop</button> -->
+      }
     }
-    <button mat-fab (click)="stop()">Stop</button>
-  }
-}
-
-
-<p>
-  Section playing: {{ songState?.section || 'None' }}
-</p>
-<p>
-  Next section: {{ songState?.nextSection || 'None' }}
-</p>
-<p>
-  Particle playing: {{ songState?.particle || 'None' }}
-</p>
-<p>
-  Next Particle: {{ songState?.nextParticle || 'None' }}
-</p>
+  </div>
+<div class="separator"></div>
+  <div class="info-section">
+    <div class="playing">
+      <h2>Playing</h2>
+      {{ songState?.section || 'None' }}
+    </div>
+    <mat-icon class="arrow" aria-hidden="false" fontIcon="arrow_right_alt"></mat-icon>
+    <div class="playing-next">
+      <h2>Next</h2>
+      {{ songState?.nextSection || 'None' }}
+    </div>
+  </div>
+</div>

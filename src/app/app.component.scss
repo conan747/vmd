@@ -1,21 +1,74 @@
-
-.queue-section-button {
-    margin: 10px;
-    color: black;
+// set 
+:host {
+  display: flex;
+  justify-content: center;
+  height: 100%
 }
+
+.card {
+  border: 1px solid black;
+  max-height: 926px;
+  max-width: 428px;
+  display: flex;
+  flex-direction: column;
+
+  .button-section {
+    display: grid;
+    // Setup the grid to have 2 columns
+    grid-template-columns: 1fr 1fr;
+
     button {
-    &.verse {
+      margin: 20px;
+      font-size: 30px;
+      font-weight: bold;
+      color: white;
+      height: 150px;
+      width: 150px;
+
+      &.verse {
         background-color: blue;
-    }
+      }
 
-    &.chorus {
-        background-color: yellow;
-    }
+      &.chorus {
+        background-color: rgb(255, 145, 0);
+      }
 
-    &.bridge {
+      &.bridge {
         background-color: green;
-    }
-    &.outro {
+      }
+
+      &.outro {
         background-color: red;
+      }
     }
+  }
+
+  .separator {
+    flex: 1;
+    border-bottom: 1px #8080806e solid;
+    margin: 20px;
+  }
+
+  .info-section {
+    display: flex;
+    justify-content: space-around;
+
+    > div {
+      margin: 20px;
+    }
+
+    h2 {
+      font-size: 20px;
+    }
+
+    .arrow {
+      display: flex;
+      align-items: center;
+      height: 100%;
+      font-size: 50px;
+      width: unset;
+      color: #8080806e;
+    }
+  }
+
 }
