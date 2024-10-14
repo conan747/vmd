@@ -8,11 +8,16 @@ import {
   withInterceptorsFromDi,
 } from '@angular/common/http';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { CommonModule } from '@angular/common';
+import {MatIconModule} from '@angular/material/icon'; 
 
 @NgModule({
   declarations: [AppComponent],
-  imports: [BrowserModule,
+  imports: [
+    BrowserModule,
+    CommonModule,
     MatButtonModule,
+    MatIconModule,
   ],
   providers: [provideHttpClient(withInterceptorsFromDi()), provideAnimationsAsync()],
   bootstrap: [AppComponent],
