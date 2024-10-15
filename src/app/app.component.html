@@ -6,10 +6,10 @@
       <button (click)="loadSong()">Load Song</button>
     } @else {
       @if (!songState?.section) {
-        <button mat-fab (click)="play(SongSection.VERSE, true)" class="verse">
+        <button mat-fab (click)="play(SongSectionType.VERSE, true)" class="verse">
           Start with Verse
         </button>
-        <button mat-fab (click)="play(SongSection.CHORUS, true)" class="chorus">
+        <button mat-fab (click)="play(SongSectionType.CHORUS, true)" class="chorus">
           Start with Chorus
         </button>
       } @else {

@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { firstValueFrom, Subject } from 'rxjs';
-import { Song, SongParticle, SongSection } from './data/song';
+import { Song, ParticleType, SongSectionType } from './data/song';
 import { inject } from '@angular/core';
 import { SongState } from './data/song';
 
@@ -16,12 +16,12 @@ export class PlayerService {
 
   private playing = false;
 
-  readonly section$ = new Subject<SongSection | null>();
-  readonly nextSection$ = new Subject<SongSection | null>();
+  readonly section$ = new Subject<SongSectionType | null>();
+  readonly nextSection$ = new Subject<SongSectionType | null>();
   readonly songState$ = new Subject<SongState>();
 
   private next?: {
-    particle: SongParticle;
+    particle: ParticleType;
     buffer: AudioBufferSourceNode;
     endsSection: boolean;
   };
@@ -38,23 +38,23 @@ export class PlayerService {
     this.songState$.next(this.songState);
   }
 
-  introTo(section: SongSection) {
+  introTo(section: SongSectionType) {
     if (!this.song) {
       throw new Error('No song loaded');
     }
 
     this.songState = new SongState(
       {
-        section: SongSection.INTRO,
-        particle: SongParticle.UNKNOWN,
-        nextParticle: SongParticle.INTRO,
+        section: SongSectionType.INTRO,
+        particle: ParticleType.UNKNOWN,
+        nextParticle: ParticleType.INTRO,
         nextSection: section,
       });
     this.updateBuffer();
     this.step();
   }
 
-  enqueue(section: SongSection) {
+  enqueue(section: SongSectionType) {
     if (!this.song) {
       throw new Error('No song loaded');
     }
@@ -74,7 +74,7 @@ export class PlayerService {
     }
     if (
       !this.songState.nextParticle ||
-      this.songState.nextParticle === SongParticle.UNKNOWN
+      this.songState.nextParticle === ParticleType.UNKNOWN
     ) {
       throw new Error('Invalid state, no next particle.');
     }
