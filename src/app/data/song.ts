@@ -43,16 +43,16 @@ const SongParticles = new Map<
   SongParticleInfo
 >([
   [ParticleType.INTRO, { startBar: 0, duration: 1 , chords: ['C']}],
-  [ParticleType.VERSE, { startBar: 1, duration: 4 , chords: MAIN_CHORDS}],
+  // [ParticleType.VERSE, { startBar: 1, duration: 4 , chords: MAIN_CHORDS}],
   [ParticleType.MID_VERSE, { startBar: 5, duration: 3, chords: MAIN_CHORDS.slice(0, 2) }],
   [ParticleType.VERSE_2_VERSE, { startBar: 8, duration: 1, chords: MAIN_CHORDS.slice(-1) }],
   [ParticleType.VERSE_2_CHORUS, { startBar: 24, duration: 1, chords: MAIN_CHORDS.slice(-1) }],
-  [ParticleType.CHORUS, { startBar: 25, duration: 4, chords: MAIN_CHORDS }],
+  // [ParticleType.CHORUS, { startBar: 25, duration: 4, chords: MAIN_CHORDS }],
   [ParticleType.MID_CHORUS, { startBar: 29, duration: 3 , chords: MAIN_CHORDS.slice(0, 2)}],
   [ParticleType.CHORUS_2_CHORUS, { startBar: 32, duration: 1, chords: MAIN_CHORDS.slice(-1) }],
   [ParticleType.CHORUS_2_VERSE, { startBar: 40, duration: 1, chords: MAIN_CHORDS.slice(-1) }],
   [ParticleType.CHORUS_2_BRIDGE, { startBar: 72, duration: 1 , chords: MAIN_CHORDS.slice(-1)}],
-  [ParticleType.BRIDGE, { startBar: 73, duration: 4, chords: BRIDGE_CHORDS }],
+  // [ParticleType.BRIDGE, { startBar: 73, duration: 4, chords: BRIDGE_CHORDS }],
   [ParticleType.MID_BRIDGE, { startBar: 85, duration: 3, chords: BRIDGE_CHORDS.slice(0, 2) }],
   [ParticleType.BRIDGE_2_CHORUS, { startBar: 88, duration: 1, chords: BRIDGE_CHORDS.slice(-1) }],
   [ParticleType.OUTRO, { startBar: 104, duration: 2, chords: ['F', 'C'] }],
@@ -60,6 +60,56 @@ const SongParticles = new Map<
   [ParticleType.CHORUS_END, { startBar: 28, duration: 1, chords: MAIN_CHORDS.slice(-1) }],
   [ParticleType.BRIDGE_END, { startBar: 76, duration: 1, chords: BRIDGE_CHORDS.slice(-1) }],
 ]);
+
+interface SongSectionIface {
+  type: SongSectionType;
+  mainParticle: SongParticleClass;
+}
+
+class SongSectionClass {
+  readonly type: SongSectionType;
+  readonly mainParticle: SongParticleClass;
+  readonly mainEnd: SongParticleClass;
+  readonly transitionTo: Map<SongSectionType, SongParticleClass>;
+
+  constructor(builder: SongSectionIface) {
+    this.type = builder.type;
+    this.mainParticle = builder.mainParticle;
+  }
+}
+
+interface SongParticleInfo2 {
+  type: ParticleType;
+  startBar: number;
+  bars: number;
+  chords: string[];
+  // These are not super necessary.
+  barDuration: number;
+};
+
+class SongParticleClass implements SongParticleInfo2 {
+  readonly type: ParticleType;
+  readonly startBar: number;
+  readonly bars: number;
+  readonly chords: string[];
+  readonly barDuration: number;
+
+  // Computed
+  readonly duration: number;
+  readonly startTime: number;
+
+  constructor(builder: SongParticleInfo2) {
+    this.type = builder.type;
+    this.startBar = builder.startBar;
+    this.bars = builder.bars;
+    this.chords = builder.chords;
+    this.barDuration = builder.barDuration;
+
+    // Computed
+    this.duration = Math.round(this.bars * this.barDuration * ROUNDING_ERROR_FIXER) / ROUNDING_ERROR_FIXER;
+    this.startTime = Math.round(this.startBar * this.barDuration * ROUNDING_ERROR_FIXER) / ROUNDING_ERROR_FIXER;
+  }
+}
 
 // Apparently javascript introduces rounding errors even in multiplication. 
 // Therefore, we need to multiply by a large number, math.round it
