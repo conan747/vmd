@@ -80,6 +80,14 @@ class SongSectionClass {
 
     this.transitionTo = new Map();
   }
+
+  transitionParticleTo(to: SongSectionType): SongParticleClass {
+    const particle = this.transitionTo.get(to);
+    if (!particle) {
+      throw new Error('Invalid transition from ' + this.type + ' to ' + to);
+    }
+    return particle;
+  }
 }
 
 interface SongParticleInfo2 {
@@ -89,7 +97,9 @@ interface SongParticleInfo2 {
   chords: string[];
   // These are not super necessary.
   barDuration: number;
-};
+  isInitialParticle: boolean;
+  isEndParticle: boolean;
+}
 
 class SongParticleClass implements SongParticleInfo2 {
   readonly type: ParticleType;
@@ -97,6 +107,8 @@ class SongParticleClass implements SongParticleInfo2 {
   readonly bars: number;
   readonly chords: string[];
   readonly barDuration: number;
+  readonly isInitialParticle: boolean;
+  readonly isEndParticle: boolean;
 
   // Computed
   readonly duration: number;
@@ -108,14 +120,20 @@ class SongParticleClass implements SongParticleInfo2 {
     this.bars = builder.bars;
     this.chords = builder.chords;
     this.barDuration = builder.barDuration;
+    this.isInitialParticle = builder.isInitialParticle;
+    this.isEndParticle = builder.isEndParticle;
 
     // Computed
-    this.duration = Math.round(this.bars * this.barDuration * ROUNDING_ERROR_FIXER) / ROUNDING_ERROR_FIXER;
-    this.startTime = Math.round(this.startBar * this.barDuration * ROUNDING_ERROR_FIXER) / ROUNDING_ERROR_FIXER;
+    this.duration =
+      Math.round(this.bars * this.barDuration * ROUNDING_ERROR_FIXER) /
+      ROUNDING_ERROR_FIXER;
+    this.startTime =
+      Math.round(this.startBar * this.barDuration * ROUNDING_ERROR_FIXER) /
+      ROUNDING_ERROR_FIXER;
   }
 }
 
-// Apparently javascript introduces rounding errors even in multiplication. 
+// Apparently javascript introduces rounding errors even in multiplication.
 // Therefore, we need to multiply by a large number, math.round it
 // and then divide by the same number to fix the rounding error.
 const ROUNDING_ERROR_FIXER = 1000;
@@ -124,21 +142,21 @@ interface SongIface {
   name: string;
   buffer: AudioBuffer;
   tempo?: number;
+  sections: Map<SongSectionType, SongSectionClass>;
 }
 
 interface SongStateIface {
-  section?: SongSectionType;
-  particle?: ParticleType;
-  nextParticle?: ParticleType;
-  nextSection?: SongSectionType;
+  section?: SongSectionClass;
+  particle?: SongParticleClass;
+  nextParticle?: SongParticleClass;
+  nextSection?: SongSectionClass;
 }
 
-
 export class SongState implements SongStateIface {
-  readonly section?: SongSectionType;
-  readonly particle?: ParticleType;
-  readonly nextParticle?: ParticleType;
-  readonly nextSection?: SongSectionType;
+  readonly section?: SongSectionClass;
+  readonly particle?: SongParticleClass;
+  readonly nextParticle?: SongParticleClass;
+  readonly nextSection?: SongSectionClass;
 
   constructor(builder: SongStateIface) {
     this.section = builder.section;
@@ -156,6 +174,8 @@ export class Song implements SongIface {
   readonly bps: number;
   readonly barDuration: number;
 
+  readonly sections: Map<SongSectionType, SongSectionClass>;
+
   constructor(builder: SongIface) {
     this.name = builder.name || 'Unknown';
     this.buffer = builder.buffer;
@@ -163,13 +183,21 @@ export class Song implements SongIface {
 
     this.bps = this.tempo / 60;
     this.barDuration = 4 / this.bps;
+    this.sections = builder.sections;
   }
 
-  getParticle(ctx: AudioContext, particle: ParticleType): AudioBuffer {
-    const duration = this.getParticleDuration(particle);
-    const startTime = this.getParticleStartTime(particle);
-    const offset = Math.round(startTime * this.buffer.sampleRate * ROUNDING_ERROR_FIXER) / ROUNDING_ERROR_FIXER;
-    const sampleDuration = Math.round(duration * this.buffer.sampleRate * ROUNDING_ERROR_FIXER) / ROUNDING_ERROR_FIXER;
+  getParticleAudio(
+    ctx: AudioContext,
+    particle: SongParticleClass
+  ): AudioBuffer {
+    const offset =
+      Math.round(
+        particle.startTime * this.buffer.sampleRate * ROUNDING_ERROR_FIXER
+      ) / ROUNDING_ERROR_FIXER;
+    const sampleDuration =
+      Math.round(
+        particle.duration * this.buffer.sampleRate * ROUNDING_ERROR_FIXER
+      ) / ROUNDING_ERROR_FIXER;
 
     const subBuffer = ctx.createBuffer(
       this.buffer.numberOfChannels,
@@ -187,11 +215,15 @@ export class Song implements SongIface {
   }
 
   increaseStep(state: SongState): SongState {
-    if (!state.section || state.section === SongSectionType.UNKNOWN) {
+    // TODO: Check if we can assume defined state always.
+    if (!state.section || state.section?.type === SongSectionType.UNKNOWN) {
       throw new Error('Invalid state, no section.');
     }
 
-    if (!state.nextSection || state.nextSection === SongSectionType.UNKNOWN) {
+    if (
+      !state.nextSection ||
+      state.nextSection?.type === SongSectionType.UNKNOWN
+    ) {
       // Loop the same section. Simply switch the particles.
       return new SongState({
         section: state.section,
@@ -199,26 +231,20 @@ export class Song implements SongIface {
         nextParticle: state.particle,
       });
     }
-    if (state.nextSection === SongSectionType.OUTRO) {
+    if (state.nextSection?.type === SongSectionType.OUTRO) {
       return new SongState({}); // We're done.
     }
-    if (state.particle === ParticleType.UNKNOWN) {
-      // It's not currently playing.
-      return new SongState({
-        section: state.section,
-        particle: state.nextParticle,
-        nextParticle: this.initialParticle(state.nextSection),
-        nextSection: state.nextSection,
-      });
-    }
-    if (state.particle === this.initialParticle(state.section)
-      && state.particle !== this.endParticle(state.section)) {
+
+    if (
+      state.particle?.type === ParticleType.UNKNOWN ||
+      state.particle?.isInitialParticle
+    ) {
       // We need to move to the next particle of the same section with a
-      // transition
+      // transition to some other section.
       return new SongState({
         section: state.section,
         particle: state.nextParticle,
-        nextParticle: this.initialParticle(state.nextSection),
+        nextParticle: state.nextSection.mainParticle,
         nextSection: state.nextSection,
       });
     }
@@ -226,11 +252,19 @@ export class Song implements SongIface {
     return new SongState({
       section: state.nextSection,
       particle: state.nextParticle,
-      nextParticle: this.endParticle(state.nextSection)
+      nextParticle: state.nextSection.mainEnd,
     });
   }
 
-  updateNextSection(state: SongState, nextSection: SongSectionType): SongState {
+  updateNextSection(
+    state: SongState,
+    nextSectionType: SongSectionType
+  ): SongState {
+    const nextSection = this.sections.get(nextSectionType);
+    if (!nextSection) {
+      // This should never happen.
+      throw new Error('Invalid next section: ' + nextSectionType);
+    }
     const songStateConfig = {
       section: state.section,
       particle: state.particle,
@@ -238,95 +272,112 @@ export class Song implements SongIface {
     };
     if (
       !state.section ||
-      state.section === SongSectionType.UNKNOWN ||
+      state.section?.type === SongSectionType.UNKNOWN ||
       !state.particle ||
-      state.particle === ParticleType.UNKNOWN
+      state.particle?.type === ParticleType.UNKNOWN
     ) {
       throw new Error('Invalid initial state to update next section');
     }
-    if (state.particle === this.endParticle(state.section)) {
+    if (state.particle.isEndParticle) {
       return new SongState({
         ...songStateConfig,
-        nextParticle: this.initialParticle(nextSection)
+        nextParticle: nextSection?.mainParticle,
       });
     }
     return new SongState({
       ...songStateConfig,
-      nextParticle: this.transitionParticle(state.section, nextSection),
+      nextParticle: state.section.transitionParticleTo(nextSection.type),
     });
   }
 
-  private transitionParticle(from: SongSectionType, to: SongSectionType): ParticleType {
-    if (from === SongSectionType.INTRO && to === SongSectionType.VERSE) {
-      return ParticleType.INTRO;
-    }
-    if (from === SongSectionType.VERSE && to === SongSectionType.VERSE) {
-      return ParticleType.VERSE_2_VERSE;
-    }
-    if (from === SongSectionType.VERSE && to === SongSectionType.CHORUS) {
-      return ParticleType.VERSE_2_CHORUS;
-    }
-    if (from === SongSectionType.CHORUS && to === SongSectionType.CHORUS) {
-      return ParticleType.CHORUS_2_CHORUS;
-    }
-    if (from === SongSectionType.CHORUS && to === SongSectionType.VERSE) {
-      return ParticleType.CHORUS_2_VERSE;
-    }
-    if (from === SongSectionType.CHORUS && to === SongSectionType.BRIDGE) {
-      return ParticleType.CHORUS_2_BRIDGE;
-    }
-    if (from === SongSectionType.BRIDGE && to === SongSectionType.BRIDGE) {
-      return ParticleType.BRIDGE_2_BRIDGE;
-    }
-    if (from === SongSectionType.BRIDGE && to === SongSectionType.CHORUS) {
-      return ParticleType.BRIDGE_2_CHORUS;
-    }
-    if (from === SongSectionType.CHORUS && to === SongSectionType.OUTRO) {
-      return ParticleType.OUTRO;
-    }
-    throw new Error(`Invalid transition from ${from} to ${to}`);
+  getInitialState(introTo: SongSectionType = SongSectionType.VERSE): SongState {
+    const introSection = this.sections.get(SongSectionType.INTRO);
+    return new SongState({
+      section: introSection,
+      particle: introSection?.mainParticle,
+      nextParticle: introSection?.mainParticle,
+      nextSection: this.sections.get(introTo),
+    });
   }
 
-  private initialParticle(section: SongSectionType): ParticleType {
-    switch (section) {
-      case SongSectionType.INTRO:
-        return ParticleType.INTRO;
-      case SongSectionType.VERSE:
-        return ParticleType.MID_VERSE;
-      case SongSectionType.CHORUS:
-        return ParticleType.MID_CHORUS;
-      case SongSectionType.BRIDGE:
-        return ParticleType.MID_BRIDGE;
-      case SongSectionType.OUTRO:
-        return ParticleType.OUTRO;
-      default:
-        throw new Error('Invalid section');
-    }
-  }
+  // private transitionParticle(
+  //   from: SongSectionType,
+  //   to: SongSectionType
+  // ): ParticleType {
+  //   if (from === SongSectionType.INTRO && to === SongSectionType.VERSE) {
+  //     return ParticleType.INTRO;
+  //   }
+  //   if (from === SongSectionType.VERSE && to === SongSectionType.VERSE) {
+  //     return ParticleType.VERSE_2_VERSE;
+  //   }
+  //   if (from === SongSectionType.VERSE && to === SongSectionType.CHORUS) {
+  //     return ParticleType.VERSE_2_CHORUS;
+  //   }
+  //   if (from === SongSectionType.CHORUS && to === SongSectionType.CHORUS) {
+  //     return ParticleType.CHORUS_2_CHORUS;
+  //   }
+  //   if (from === SongSectionType.CHORUS && to === SongSectionType.VERSE) {
+  //     return ParticleType.CHORUS_2_VERSE;
+  //   }
+  //   if (from === SongSectionType.CHORUS && to === SongSectionType.BRIDGE) {
+  //     return ParticleType.CHORUS_2_BRIDGE;
+  //   }
+  //   if (from === SongSectionType.BRIDGE && to === SongSectionType.BRIDGE) {
+  //     return ParticleType.BRIDGE_2_BRIDGE;
+  //   }
+  //   if (from === SongSectionType.BRIDGE && to === SongSectionType.CHORUS) {
+  //     return ParticleType.BRIDGE_2_CHORUS;
+  //   }
+  //   if (from === SongSectionType.CHORUS && to === SongSectionType.OUTRO) {
+  //     return ParticleType.OUTRO;
+  //   }
+  //   throw new Error(`Invalid transition from ${from} to ${to}`);
+  // }
 
-  private endParticle(section: SongSectionType): ParticleType {
-    switch (section) {
-      case SongSectionType.VERSE:
-        return ParticleType.VERSE_END;
-      case SongSectionType.CHORUS:
-        return ParticleType.CHORUS_END;
-      case SongSectionType.BRIDGE:
-        return ParticleType.BRIDGE_END;
-      case SongSectionType.OUTRO:
-        return ParticleType.OUTRO;
-      case SongSectionType.INTRO:
-        return ParticleType.INTRO;
-      default:
-        throw new Error('Invalid section');
-    }
-  }
+  // private initialParticle(section: SongSectionType): ParticleType {
+  //   switch (section) {
+  //     case SongSectionType.INTRO:
+  //       return ParticleType.INTRO;
+  //     case SongSectionType.VERSE:
+  //       return ParticleType.MID_VERSE;
+  //     case SongSectionType.CHORUS:
+  //       return ParticleType.MID_CHORUS;
+  //     case SongSectionType.BRIDGE:
+  //       return ParticleType.MID_BRIDGE;
+  //     case SongSectionType.OUTRO:
+  //       return ParticleType.OUTRO;
+  //     default:
+  //       throw new Error('Invalid section');
+  //   }
+  // }
+
+  // private endParticle(section: SongSectionType): ParticleType {
+  //   switch (section) {
+  //     case SongSectionType.VERSE:
+  //       return ParticleType.VERSE_END;
+  //     case SongSectionType.CHORUS:
+  //       return ParticleType.CHORUS_END;
+  //     case SongSectionType.BRIDGE:
+  //       return ParticleType.BRIDGE_END;
+  //     case SongSectionType.OUTRO:
+  //       return ParticleType.OUTRO;
+  //     case SongSectionType.INTRO:
+  //       return ParticleType.INTRO;
+  //     default:
+  //       throw new Error('Invalid section');
+  //   }
+  // }
 
   private getParticleStartTime(particle: ParticleType): number {
     const particleData = SongParticles.get(particle);
     if (!particleData) {
       throw new Error('Invalid particle');
     }
-    return Math.round(particleData.startBar * this.barDuration * ROUNDING_ERROR_FIXER) / ROUNDING_ERROR_FIXER;
+    return (
+      Math.round(
+        particleData.startBar * this.barDuration * ROUNDING_ERROR_FIXER
+      ) / ROUNDING_ERROR_FIXER
+    );
   }
 
   private getParticleDuration(particle: ParticleType): number {
@@ -334,6 +385,10 @@ export class Song implements SongIface {
     if (!particleData) {
       throw new Error('Invalid particle');
     }
-    return Math.round(particleData.duration * this.barDuration * ROUNDING_ERROR_FIXER) / ROUNDING_ERROR_FIXER;
+    return (
+      Math.round(
+        particleData.duration * this.barDuration * ROUNDING_ERROR_FIXER
+      ) / ROUNDING_ERROR_FIXER
+    );
   }
 }

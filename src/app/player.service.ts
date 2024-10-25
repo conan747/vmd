@@ -33,7 +33,12 @@ export class PlayerService {
       this.http.get(url, { responseType: 'arraybuffer' })
     );
     const audioBuffer = await this.audioContext.decodeAudioData(response);
-    this.song = new Song({ name: url, buffer: audioBuffer, tempo: 100 });
+    this.song = new Song({
+      name: url,
+      buffer: audioBuffer,
+      tempo: 100,
+      sections: new Map(), // Fill this up.
+    });
     this.songState = new SongState({});
     this.songState$.next(this.songState);
   }
@@ -43,13 +48,7 @@ export class PlayerService {
       throw new Error('No song loaded');
     }
 
-    this.songState = new SongState(
-      {
-        section: SongSectionType.INTRO,
-        particle: ParticleType.UNKNOWN,
-        nextParticle: ParticleType.INTRO,
-        nextSection: section,
-      });
+    this.songState = this.song.getInitialState(section);
     this.updateBuffer();
     this.step();
   }
@@ -74,12 +73,12 @@ export class PlayerService {
     }
     if (
       !this.songState.nextParticle ||
-      this.songState.nextParticle === ParticleType.UNKNOWN
+      this.songState.nextParticle.type === ParticleType.UNKNOWN
     ) {
       throw new Error('Invalid state, no next particle.');
     }
     this.nextBuffer = this.audioContext.createBufferSource();
-    this.nextBuffer.buffer = this.song.getParticle(
+    this.nextBuffer.buffer = this.song.getParticleAudio(
       this.audioContext,
       this.songState.nextParticle
     );
