@@ -64,6 +64,7 @@ const SongParticles = new Map<
 interface SongSectionIface {
   type: SongSectionType;
   mainParticle: SongParticleClass;
+  mainEnd: SongParticleClass;
 }
 
 class SongSectionClass {
@@ -75,6 +76,9 @@ class SongSectionClass {
   constructor(builder: SongSectionIface) {
     this.type = builder.type;
     this.mainParticle = builder.mainParticle;
+    this.mainEnd = builder.mainEnd;
+
+    this.transitionTo = new Map();
   }
 }
 
