@@ -1,8 +1,8 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { PlayerService } from './player.service';
-import { SongParticle } from './data/song';
+import { ParticleType } from './data/song';
 import { inject } from '@angular/core';
-import { SongSection } from './data/song';
+import { SongSectionType } from './data/song';
 
 @Component({
   selector: 'app-root',
@@ -10,28 +10,24 @@ import { SongSection } from './data/song';
   styleUrls: ['./app.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
   readonly playerService: PlayerService = inject(PlayerService);
-  protected readonly SongParticle = SongParticle;
-  protected readonly SongSection = SongSection;
+  protected readonly ParticleType = ParticleType;
+  protected readonly SongSectionType = SongSectionType;
   readonly songState$ = this.playerService.songState$;
 
   readonly availableSections = [
-    SongSection.VERSE,
-    SongSection.CHORUS,
-    SongSection.BRIDGE,
-    SongSection.OUTRO,
+    SongSectionType.VERSE,
+    SongSectionType.CHORUS,
+    SongSectionType.BRIDGE,
+    SongSectionType.OUTRO,
   ];
 
-  ngOnInit() {
-    this.loadSong();
+  loadSong(song: string) {
+    this.playerService.loadSong(song);
   }
 
-  loadSong() {
-    this.playerService.loadSong('assets/sad_jazz_full.mp3');
-  }
-
-  play(section: SongSection, fromIntro = false) {
+  play(section: SongSectionType, fromIntro = false) {
     if (fromIntro) {
       this.playerService.introTo(section);
     } else {

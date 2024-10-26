@@ -1,15 +1,16 @@
-@let songState=(songState$ | async);
+@let songState=songState$ | async;
 
 <div class="card">
   <div class="button-section">
     @if (songState === null) {
-      <button (click)="loadSong()">Load Song</button>
+      <button (click)="loadSong('biab')">BIAB demo</button>
+      <button (click)="loadSong('jjazzlab')">JJAZZLAB demo</button>
     } @else {
       @if (!songState?.section) {
-        <button mat-fab (click)="play(SongSection.VERSE, true)" class="verse">
+        <button mat-fab (click)="play(SongSectionType.VERSE, true)" class="verse">
           Start with Verse
         </button>
-        <button mat-fab (click)="play(SongSection.CHORUS, true)" class="chorus">
+        <button mat-fab (click)="play(SongSectionType.CHORUS, true)" class="chorus">
           Start with Chorus
         </button>
       } @else {
