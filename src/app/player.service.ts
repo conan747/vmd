@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { firstValueFrom, Subject } from 'rxjs';
 import { Song, ParticleType, SongSectionType } from './data/song';
 import { inject } from '@angular/core';
-import { SongState } from './data/song';
+import { SongState, biab_particles } from './data/song';
 
 @Injectable({
   providedIn: 'root',
@@ -33,7 +33,12 @@ export class PlayerService {
       this.http.get(url, { responseType: 'arraybuffer' })
     );
     const audioBuffer = await this.audioContext.decodeAudioData(response);
-    this.song = new Song({ name: url, buffer: audioBuffer, tempo: 100 });
+    this.song = new Song({
+      name: url,
+      buffer: audioBuffer,
+      tempo: 90,
+      songParticles: biab_particles,
+    });
     this.songState = new SongState({});
     this.songState$.next(this.songState);
   }
@@ -43,13 +48,12 @@ export class PlayerService {
       throw new Error('No song loaded');
     }
 
-    this.songState = new SongState(
-      {
-        section: SongSectionType.INTRO,
-        particle: ParticleType.UNKNOWN,
-        nextParticle: ParticleType.INTRO,
-        nextSection: section,
-      });
+    this.songState = new SongState({
+      section: SongSectionType.INTRO,
+      particle: ParticleType.UNKNOWN,
+      nextParticle: ParticleType.INTRO,
+      nextSection: section,
+    });
     this.updateBuffer();
     this.step();
   }

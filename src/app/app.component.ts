@@ -4,6 +4,10 @@ import { ParticleType } from './data/song';
 import { inject } from '@angular/core';
 import { SongSectionType } from './data/song';
 
+const BIAB_SONG =
+  'https://storage.googleapis.com/vmd-assets/ballad_good_demo_Render.mp3';
+const JJAZZLAB_SONG = '/assets/sad_jazz_full.mp3';
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -28,7 +32,7 @@ export class AppComponent implements OnInit {
   }
 
   loadSong() {
-    this.playerService.loadSong('/assets/sad_jazz_full.mp3');
+    this.playerService.loadSong(BIAB_SONG);
   }
 
   play(section: SongSectionType, fromIntro = false) {

@@ -38,30 +38,119 @@ interface SongParticleInfo {
 const MAIN_CHORDS = ['C', 'G', 'Am', 'F'];
 const BRIDGE_CHORDS = ['D#', 'A#', 'Cm', 'G#'];
 
-const SongParticles = new Map<
-  ParticleType,
-  SongParticleInfo
->([
-  [ParticleType.INTRO, { startBar: 0, duration: 1 , chords: ['C']}],
-  [ParticleType.VERSE, { startBar: 1, duration: 4 , chords: MAIN_CHORDS}],
-  [ParticleType.MID_VERSE, { startBar: 5, duration: 3, chords: MAIN_CHORDS.slice(0, 2) }],
-  [ParticleType.VERSE_2_VERSE, { startBar: 8, duration: 1, chords: MAIN_CHORDS.slice(-1) }],
-  [ParticleType.VERSE_2_CHORUS, { startBar: 24, duration: 1, chords: MAIN_CHORDS.slice(-1) }],
+export const jjazzlab_particles = new Map<ParticleType, SongParticleInfo>([
+  [ParticleType.INTRO, { startBar: 0, duration: 1, chords: ['C'] }],
+  [ParticleType.VERSE, { startBar: 1, duration: 4, chords: MAIN_CHORDS }],
+  [
+    ParticleType.MID_VERSE,
+    { startBar: 5, duration: 3, chords: MAIN_CHORDS.slice(0, 2) },
+  ],
+  [
+    ParticleType.VERSE_2_VERSE,
+    { startBar: 8, duration: 1, chords: MAIN_CHORDS.slice(-1) },
+  ],
+  [
+    ParticleType.VERSE_2_CHORUS,
+    { startBar: 24, duration: 1, chords: MAIN_CHORDS.slice(-1) },
+  ],
   [ParticleType.CHORUS, { startBar: 25, duration: 4, chords: MAIN_CHORDS }],
-  [ParticleType.MID_CHORUS, { startBar: 29, duration: 3 , chords: MAIN_CHORDS.slice(0, 2)}],
-  [ParticleType.CHORUS_2_CHORUS, { startBar: 32, duration: 1, chords: MAIN_CHORDS.slice(-1) }],
-  [ParticleType.CHORUS_2_VERSE, { startBar: 40, duration: 1, chords: MAIN_CHORDS.slice(-1) }],
-  [ParticleType.CHORUS_2_BRIDGE, { startBar: 72, duration: 1 , chords: MAIN_CHORDS.slice(-1)}],
+  [
+    ParticleType.MID_CHORUS,
+    { startBar: 29, duration: 3, chords: MAIN_CHORDS.slice(0, 2) },
+  ],
+  [
+    ParticleType.CHORUS_2_CHORUS,
+    { startBar: 32, duration: 1, chords: MAIN_CHORDS.slice(-1) },
+  ],
+  [
+    ParticleType.CHORUS_2_VERSE,
+    { startBar: 40, duration: 1, chords: MAIN_CHORDS.slice(-1) },
+  ],
+  [
+    ParticleType.CHORUS_2_BRIDGE,
+    { startBar: 72, duration: 1, chords: MAIN_CHORDS.slice(-1) },
+  ],
   [ParticleType.BRIDGE, { startBar: 73, duration: 4, chords: BRIDGE_CHORDS }],
-  [ParticleType.MID_BRIDGE, { startBar: 85, duration: 3, chords: BRIDGE_CHORDS.slice(0, 2) }],
-  [ParticleType.BRIDGE_2_CHORUS, { startBar: 88, duration: 1, chords: BRIDGE_CHORDS.slice(-1) }],
+  [
+    ParticleType.MID_BRIDGE,
+    { startBar: 85, duration: 3, chords: BRIDGE_CHORDS.slice(0, 2) },
+  ],
+  [
+    ParticleType.BRIDGE_2_CHORUS,
+    { startBar: 88, duration: 1, chords: BRIDGE_CHORDS.slice(-1) },
+  ],
   [ParticleType.OUTRO, { startBar: 104, duration: 2, chords: ['F', 'C'] }],
-  [ParticleType.VERSE_END, { startBar: 4, duration: 1, chords: MAIN_CHORDS.slice(-1)  }],
-  [ParticleType.CHORUS_END, { startBar: 28, duration: 1, chords: MAIN_CHORDS.slice(-1) }],
-  [ParticleType.BRIDGE_END, { startBar: 76, duration: 1, chords: BRIDGE_CHORDS.slice(-1) }],
+  [
+    ParticleType.VERSE_END,
+    { startBar: 4, duration: 1, chords: MAIN_CHORDS.slice(-1) },
+  ],
+  [
+    ParticleType.CHORUS_END,
+    { startBar: 28, duration: 1, chords: MAIN_CHORDS.slice(-1) },
+  ],
+  [
+    ParticleType.BRIDGE_END,
+    { startBar: 76, duration: 1, chords: BRIDGE_CHORDS.slice(-1) },
+  ],
 ]);
 
-// Apparently javascript introduces rounding errors even in multiplication. 
+export const biab_particles = new Map<ParticleType, SongParticleInfo>([
+  [ParticleType.INTRO, { startBar: 1, duration: 8, chords: ['C'] }],
+  [ParticleType.VERSE, { startBar: 9, duration: 4, chords: MAIN_CHORDS }],
+  [
+    ParticleType.MID_VERSE,
+    { startBar: 9, duration: 3, chords: MAIN_CHORDS.slice(0, 2) },
+  ],
+  [
+    ParticleType.VERSE_2_VERSE,
+    { startBar: 16, duration: 1, chords: MAIN_CHORDS.slice(-1) },
+  ],
+  [
+    ParticleType.VERSE_2_CHORUS,
+    { startBar: 24, duration: 1, chords: MAIN_CHORDS.slice(-1) },
+  ],
+  [ParticleType.CHORUS, { startBar: 25, duration: 4, chords: MAIN_CHORDS }],
+  [
+    ParticleType.MID_CHORUS,
+    { startBar: 25, duration: 3, chords: MAIN_CHORDS.slice(0, 2) },
+  ],
+  [
+    ParticleType.CHORUS_2_CHORUS,
+    { startBar: 32, duration: 1, chords: MAIN_CHORDS.slice(-1) },
+  ],
+  [
+    ParticleType.CHORUS_2_VERSE,
+    { startBar: 40, duration: 1, chords: MAIN_CHORDS.slice(-1) },
+  ],
+  [
+    ParticleType.CHORUS_2_BRIDGE,
+    { startBar: 56, duration: 1, chords: MAIN_CHORDS.slice(-1) },
+  ],
+  [ParticleType.BRIDGE, { startBar: 57, duration: 4, chords: BRIDGE_CHORDS }],
+  [
+    ParticleType.MID_BRIDGE,
+    { startBar: 57, duration: 3, chords: BRIDGE_CHORDS.slice(0, 2) },
+  ],
+  [
+    ParticleType.BRIDGE_2_CHORUS,
+    { startBar: 72, duration: 1, chords: BRIDGE_CHORDS.slice(-1) },
+  ],
+  [ParticleType.OUTRO, { startBar: 81, duration: 2, chords: ['F', 'C'] }],
+  [
+    ParticleType.VERSE_END,
+    { startBar: 12, duration: 1, chords: MAIN_CHORDS.slice(-1) },
+  ],
+  [
+    ParticleType.CHORUS_END,
+    { startBar: 28, duration: 1, chords: MAIN_CHORDS.slice(-1) },
+  ],
+  [
+    ParticleType.BRIDGE_END,
+    { startBar: 60, duration: 1, chords: BRIDGE_CHORDS.slice(-1) },
+  ],
+]);
+
+// Apparently javascript introduces rounding errors even in multiplication.
 // Therefore, we need to multiply by a large number, math.round it
 // and then divide by the same number to fix the rounding error.
 const ROUNDING_ERROR_FIXER = 1000;
@@ -70,6 +159,8 @@ interface SongIface {
   name: string;
   buffer: AudioBuffer;
   tempo?: number;
+
+  songParticles: Map<ParticleType, SongParticleInfo>;
 }
 
 interface SongStateIface {
@@ -78,7 +169,6 @@ interface SongStateIface {
   nextParticle?: ParticleType;
   nextSection?: SongSectionType;
 }
-
 
 export class SongState implements SongStateIface {
   readonly section?: SongSectionType;
@@ -102,10 +192,13 @@ export class Song implements SongIface {
   readonly bps: number;
   readonly barDuration: number;
 
+  readonly songParticles: Map<ParticleType, SongParticleInfo>;
+
   constructor(builder: SongIface) {
     this.name = builder.name || 'Unknown';
     this.buffer = builder.buffer;
     this.tempo = builder.tempo || 100;
+    this.songParticles = builder.songParticles || biab_particles;
 
     this.bps = this.tempo / 60;
     this.barDuration = 4 / this.bps;
@@ -114,8 +207,12 @@ export class Song implements SongIface {
   getParticle(ctx: AudioContext, particle: ParticleType): AudioBuffer {
     const duration = this.getParticleDuration(particle);
     const startTime = this.getParticleStartTime(particle);
-    const offset = Math.round(startTime * this.buffer.sampleRate * ROUNDING_ERROR_FIXER) / ROUNDING_ERROR_FIXER;
-    const sampleDuration = Math.round(duration * this.buffer.sampleRate * ROUNDING_ERROR_FIXER) / ROUNDING_ERROR_FIXER;
+    const offset =
+      Math.round(startTime * this.buffer.sampleRate * ROUNDING_ERROR_FIXER) /
+      ROUNDING_ERROR_FIXER;
+    const sampleDuration =
+      Math.round(duration * this.buffer.sampleRate * ROUNDING_ERROR_FIXER) /
+      ROUNDING_ERROR_FIXER;
 
     const subBuffer = ctx.createBuffer(
       this.buffer.numberOfChannels,
@@ -157,8 +254,10 @@ export class Song implements SongIface {
         nextSection: state.nextSection,
       });
     }
-    if (state.particle === this.initialParticle(state.section)
-      && state.particle !== this.endParticle(state.section)) {
+    if (
+      state.particle === this.initialParticle(state.section) &&
+      state.particle !== this.endParticle(state.section)
+    ) {
       // We need to move to the next particle of the same section with a
       // transition
       return new SongState({
@@ -172,7 +271,7 @@ export class Song implements SongIface {
     return new SongState({
       section: state.nextSection,
       particle: state.nextParticle,
-      nextParticle: this.endParticle(state.nextSection)
+      nextParticle: this.endParticle(state.nextSection),
     });
   }
 
@@ -193,7 +292,7 @@ export class Song implements SongIface {
     if (state.particle === this.endParticle(state.section)) {
       return new SongState({
         ...songStateConfig,
-        nextParticle: this.initialParticle(nextSection)
+        nextParticle: this.initialParticle(nextSection),
       });
     }
     return new SongState({
@@ -202,7 +301,10 @@ export class Song implements SongIface {
     });
   }
 
-  private transitionParticle(from: SongSectionType, to: SongSectionType): ParticleType {
+  private transitionParticle(
+    from: SongSectionType,
+    to: SongSectionType
+  ): ParticleType {
     if (from === SongSectionType.INTRO && to === SongSectionType.VERSE) {
       return ParticleType.INTRO;
     }
@@ -268,18 +370,26 @@ export class Song implements SongIface {
   }
 
   private getParticleStartTime(particle: ParticleType): number {
-    const particleData = SongParticles.get(particle);
+    const particleData = this.songParticles.get(particle);
     if (!particleData) {
       throw new Error('Invalid particle');
     }
-    return Math.round(particleData.startBar * this.barDuration * ROUNDING_ERROR_FIXER) / ROUNDING_ERROR_FIXER;
+    return (
+      Math.round(
+        (particleData.startBar - 1) * this.barDuration * ROUNDING_ERROR_FIXER
+      ) / ROUNDING_ERROR_FIXER
+    );
   }
 
   private getParticleDuration(particle: ParticleType): number {
-    const particleData = SongParticles.get(particle);
+    const particleData = this.songParticles.get(particle);
     if (!particleData) {
       throw new Error('Invalid particle');
     }
-    return Math.round(particleData.duration * this.barDuration * ROUNDING_ERROR_FIXER) / ROUNDING_ERROR_FIXER;
+    return (
+      Math.round(
+        particleData.duration * this.barDuration * ROUNDING_ERROR_FIXER
+      ) / ROUNDING_ERROR_FIXER
+    );
   }
 }
