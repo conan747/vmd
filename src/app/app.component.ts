@@ -1,12 +1,8 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { PlayerService } from './player.service';
 import { ParticleType } from './data/song';
 import { inject } from '@angular/core';
 import { SongSectionType } from './data/song';
-
-const BIAB_SONG =
-  'https://storage.googleapis.com/vmd-assets/ballad_good_demo_Render.mp3';
-const JJAZZLAB_SONG = '/assets/sad_jazz_full.mp3';
 
 @Component({
   selector: 'app-root',
@@ -14,7 +10,7 @@ const JJAZZLAB_SONG = '/assets/sad_jazz_full.mp3';
   styleUrls: ['./app.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
   readonly playerService: PlayerService = inject(PlayerService);
   protected readonly ParticleType = ParticleType;
   protected readonly SongSectionType = SongSectionType;
@@ -27,12 +23,8 @@ export class AppComponent implements OnInit {
     SongSectionType.OUTRO,
   ];
 
-  ngOnInit() {
-    this.loadSong();
-  }
-
-  loadSong() {
-    this.playerService.loadSong(BIAB_SONG);
+  loadSong(song: string) {
+    this.playerService.loadSong(song);
   }
 
   play(section: SongSectionType, fromIntro = false) {

@@ -3,7 +3,23 @@ import { Injectable } from '@angular/core';
 import { firstValueFrom, Subject } from 'rxjs';
 import { Song, ParticleType, SongSectionType } from './data/song';
 import { inject } from '@angular/core';
-import { SongState, biab_particles } from './data/song';
+import { SongState, biab_particles, jjazzlab_particles } from './data/song';
+
+const BIAB_URL =
+  'https://storage.googleapis.com/vmd-assets/ballad_good_demo_Render.mp3';
+const JJAZZLAB_URL = '/assets/sad_jazz_full.mp3';
+
+const BIAB_SONG_INFO = {
+  name: 'Ballad Good Demo',
+  tempo: 90,
+  songParticles: biab_particles,
+};
+
+const JJAZZLAB_SONG_INFO = {
+  name: 'Sad Jazz Full',
+  tempo: 100,
+  songParticles: jjazzlab_particles,
+};
 
 @Injectable({
   providedIn: 'root',
@@ -28,16 +44,17 @@ export class PlayerService {
 
   private nextBuffer?: AudioBufferSourceNode;
 
-  async loadSong(url: string) {
+  async loadSong(song: string) {
+    const url = song === 'biab' ? BIAB_URL : JJAZZLAB_URL;
+
     const response = await firstValueFrom(
       this.http.get(url, { responseType: 'arraybuffer' })
     );
     const audioBuffer = await this.audioContext.decodeAudioData(response);
+    const songInfo = song === 'biab' ? BIAB_SONG_INFO : JJAZZLAB_SONG_INFO;
     this.song = new Song({
-      name: url,
+      ...songInfo,
       buffer: audioBuffer,
-      tempo: 90,
-      songParticles: biab_particles,
     });
     this.songState = new SongState({});
     this.songState$.next(this.songState);

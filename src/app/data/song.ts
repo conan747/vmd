@@ -39,58 +39,58 @@ const MAIN_CHORDS = ['C', 'G', 'Am', 'F'];
 const BRIDGE_CHORDS = ['D#', 'A#', 'Cm', 'G#'];
 
 export const jjazzlab_particles = new Map<ParticleType, SongParticleInfo>([
-  [ParticleType.INTRO, { startBar: 0, duration: 1, chords: ['C'] }],
-  [ParticleType.VERSE, { startBar: 1, duration: 4, chords: MAIN_CHORDS }],
+  [ParticleType.INTRO, { startBar: 1, duration: 1, chords: ['C'] }],
+  [ParticleType.VERSE, { startBar: 2, duration: 4, chords: MAIN_CHORDS }],
   [
     ParticleType.MID_VERSE,
-    { startBar: 5, duration: 3, chords: MAIN_CHORDS.slice(0, 2) },
+    { startBar: 6, duration: 3, chords: MAIN_CHORDS.slice(0, 2) },
   ],
   [
     ParticleType.VERSE_2_VERSE,
-    { startBar: 8, duration: 1, chords: MAIN_CHORDS.slice(-1) },
+    { startBar: 9, duration: 1, chords: MAIN_CHORDS.slice(-1) },
   ],
   [
     ParticleType.VERSE_2_CHORUS,
-    { startBar: 24, duration: 1, chords: MAIN_CHORDS.slice(-1) },
+    { startBar: 25, duration: 1, chords: MAIN_CHORDS.slice(-1) },
   ],
-  [ParticleType.CHORUS, { startBar: 25, duration: 4, chords: MAIN_CHORDS }],
+  [ParticleType.CHORUS, { startBar: 26, duration: 4, chords: MAIN_CHORDS }],
   [
     ParticleType.MID_CHORUS,
-    { startBar: 29, duration: 3, chords: MAIN_CHORDS.slice(0, 2) },
+    { startBar: 30, duration: 3, chords: MAIN_CHORDS.slice(0, 2) },
   ],
   [
     ParticleType.CHORUS_2_CHORUS,
-    { startBar: 32, duration: 1, chords: MAIN_CHORDS.slice(-1) },
+    { startBar: 33, duration: 1, chords: MAIN_CHORDS.slice(-1) },
   ],
   [
     ParticleType.CHORUS_2_VERSE,
-    { startBar: 40, duration: 1, chords: MAIN_CHORDS.slice(-1) },
+    { startBar: 41, duration: 1, chords: MAIN_CHORDS.slice(-1) },
   ],
   [
     ParticleType.CHORUS_2_BRIDGE,
-    { startBar: 72, duration: 1, chords: MAIN_CHORDS.slice(-1) },
+    { startBar: 73, duration: 1, chords: MAIN_CHORDS.slice(-1) },
   ],
-  [ParticleType.BRIDGE, { startBar: 73, duration: 4, chords: BRIDGE_CHORDS }],
+  [ParticleType.BRIDGE, { startBar: 74, duration: 4, chords: BRIDGE_CHORDS }],
   [
     ParticleType.MID_BRIDGE,
-    { startBar: 85, duration: 3, chords: BRIDGE_CHORDS.slice(0, 2) },
+    { startBar: 86, duration: 3, chords: BRIDGE_CHORDS.slice(0, 2) },
   ],
   [
     ParticleType.BRIDGE_2_CHORUS,
-    { startBar: 88, duration: 1, chords: BRIDGE_CHORDS.slice(-1) },
+    { startBar: 89, duration: 1, chords: BRIDGE_CHORDS.slice(-1) },
   ],
-  [ParticleType.OUTRO, { startBar: 104, duration: 2, chords: ['F', 'C'] }],
+  [ParticleType.OUTRO, { startBar: 105, duration: 2, chords: ['F', 'C'] }],
   [
     ParticleType.VERSE_END,
-    { startBar: 4, duration: 1, chords: MAIN_CHORDS.slice(-1) },
+    { startBar: 5, duration: 1, chords: MAIN_CHORDS.slice(-1) },
   ],
   [
     ParticleType.CHORUS_END,
-    { startBar: 28, duration: 1, chords: MAIN_CHORDS.slice(-1) },
+    { startBar: 29, duration: 1, chords: MAIN_CHORDS.slice(-1) },
   ],
   [
     ParticleType.BRIDGE_END,
-    { startBar: 76, duration: 1, chords: BRIDGE_CHORDS.slice(-1) },
+    { startBar: 77, duration: 1, chords: BRIDGE_CHORDS.slice(-1) },
   ],
 ]);
 
@@ -186,7 +186,7 @@ export class SongState implements SongStateIface {
 
 export class Song implements SongIface {
   readonly name: string;
-  readonly buffer: AudioBuffer;
+  readonly buffer: AudioBuffer; // This is the original, full song buffer.
   readonly tempo: number;
 
   readonly bps: number;
