@@ -7,7 +7,8 @@ import { SongState, biab_particles, jjazzlab_particles } from './data/song';
 
 const BIAB_URL =
   'https://storage.googleapis.com/vmd-assets/ballad_good_demo_Render.mp3';
-const JJAZZLAB_URL = '/assets/sad_jazz_full.mp3';
+const JJAZZLAB_URL =
+  'https://storage.googleapis.com/vmd-assets/sad_jazz_full.mp3';
 
 const BIAB_SONG_INFO = {
   name: 'Ballad Good Demo',
