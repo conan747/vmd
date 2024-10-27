@@ -32,6 +32,7 @@ export class PlayerService {
   private songState: SongState = new SongState({});
 
   private playing = false;
+  private playingClip: AudioBufferSourceNode | null = null;
 
   readonly section$ = new Subject<SongSectionType | null>();
   readonly nextSection$ = new Subject<SongSectionType | null>();
@@ -59,6 +60,24 @@ export class PlayerService {
     });
     this.songState = new SongState({});
     this.songState$.next(this.songState);
+  }
+
+  async playClip(url: string) {
+    if (this.playing) {
+      this.playingClip?.stop();
+      return;
+    }
+    const response = await firstValueFrom(
+      this.http.get(url, { responseType: 'arraybuffer' })
+    );
+    const audioBuffer = await this.audioContext.decodeAudioData(response);
+    const buffer = this.audioContext.createBufferSource();
+    buffer.buffer = audioBuffer;
+    buffer.connect(this.audioContext.destination);
+    buffer.start();
+    this.playing = true;
+    this.playingClip = buffer;
+    buffer.onended = () => (this.playing = false);
   }
 
   introTo(section: SongSectionType) {

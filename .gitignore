@@ -43,4 +43,4 @@ testem.log
 .DS_Store
 Thumbs.db
 
-src/assets/song3
+/song3

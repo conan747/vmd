@@ -5,6 +5,7 @@
     @if (songState === null) {
       <button (click)="loadSong('biab')">BIAB demo</button>
       <button (click)="loadSong('jjazzlab')">JJAZZLAB demo</button>
+      <button (click)="playClip('https://storage.googleapis.com/vmd-assets/tetitato.mp3')">TETITATO</button>
     } @else {
       @if (!songState?.section) {
         <button mat-fab (click)="play(SongSectionType.VERSE, true)" class="verse">

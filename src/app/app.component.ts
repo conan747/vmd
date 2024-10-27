@@ -27,6 +27,10 @@ export class AppComponent {
     this.playerService.loadSong(song);
   }
 
+  playClip(url: string) {
+    this.playerService.playClip(url);
+  }
+
   play(section: SongSectionType, fromIntro = false) {
     if (fromIntro) {
       this.playerService.introTo(section);
